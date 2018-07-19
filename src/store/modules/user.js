@@ -6,9 +6,8 @@ const user = {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: []
+    role: []
   },
-
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
@@ -19,17 +18,20 @@ const user = {
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
+    SET_RIGHTS_FROM_ROLE: (state, role) => {
+      const strRights = role.rights
+      state.rights = strRights.split(',')
+    },
+    SET_RIGHTS: (state, rights) => {
+      state.rights = rights
     }
   },
-
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
+      const loginName = userInfo.loginName.trim()
       return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
+        login(loginName, userInfo.password).then(response => {
           const data = response.data
           setToken(data.token)
           commit('SET_TOKEN', data.token)
@@ -45,12 +47,12 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
           const data = response.data
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
+          if (data.role) { // 验证返回的roles是否是一个非空数组
+            commit('SET_RIGHTS_FROM_ROLE', data.role)
           } else {
-            reject('getInfo: roles must be a non-null array !')
+            reject('getInfo: no roles')
           }
-          commit('SET_NAME', data.name)
+          commit('SET_NAME', data.userName)
           commit('SET_AVATAR', data.avatar)
           resolve(response)
         }).catch(error => {
@@ -64,7 +66,7 @@ const user = {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
+          commit('SET_RIGHTS', '')
           removeToken()
           resolve()
         }).catch(error => {

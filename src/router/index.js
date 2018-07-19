@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+const _import = require('./_import_' + process.env.NODE_ENV)
 
 // in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in production use lazy-loading;
 // detail: https://panjiachen.github.io/vue-element-admin-site/#/lazy-loading
@@ -26,52 +27,45 @@ export const constantRouterMap = [
   { path: '/404', component: () => import('@/views/404'), hidden: true },
 
   {
-    path: '/',
+    path: '',
     component: Layout,
-    redirect: '/dashboard',
-    name: 'Dashboard',
-    hidden: true,
+    redirect: 'dashboard',
+    name: 'dashboard',
+    meta: { title: '首页', icon: 'dashboard', noCache: true },
     children: [{
       path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
+      name: '首页',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '首页', icon: 'dashboard', noCache: true }
     }]
   },
-
   {
-    path: '/example',
+    path: '/supplier',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+    redirect: '',
+    name: '供应商管理',
+    meta: { title: '供应商管理', icon: 'example' },
     children: [
       {
         path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        name: '供应商列表',
+        component: () => import('@/views/supplier/index'),
+        meta: { title: '供应商列表', icon: 'peoples' }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
-      }
-    ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
+        path: 'settleOrigin',
+        name: '结算原始数据',
+        component: () => import('@/views/supplier/settleOrigin'),
+        meta: { title: '结算原始数据', icon: 'settleOrigin' }
+      },
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        path: 'settle',
+        name: '结算列表',
+        component: () => import('@/views/supplier/settle'),
+        meta: { title: '结算列表', icon: 'settle' }
       }
     ]
   },
-
   { path: '*', redirect: '/404', hidden: true }
 ]
 
@@ -81,3 +75,34 @@ export default new Router({
   routes: constantRouterMap
 })
 
+export const asyncRouterMap = [
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/permission/index',
+    alwaysShow: true, // will always show the root menu
+    meta: {
+      title: 'permission',
+      icon: 'lock',
+      roles: ['admin', 'editor'] // you can set roles in root nav
+    },
+    children: [{
+      path: 'page',
+      component: _import('permission/page'),
+      name: 'pagePermission',
+      meta: {
+        title: 'pagePermission',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    }, {
+      path: 'directive',
+      component: _import('permission/directive'),
+      name: 'directivePermission',
+      meta: {
+        title: 'directivePermission'
+        // if do not set roles, means: this page does not require permission
+      }
+    }]
+  },
+  { path: '*', redirect: '/404', hidden: true }
+]

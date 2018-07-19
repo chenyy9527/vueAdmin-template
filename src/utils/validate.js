@@ -30,4 +30,15 @@ export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
+/* 正整数*/
+export function validatPositiveInteger(num) {
+  const reg = /^\+?[1-9][0-9]*$/
+  return reg.test(num)
+}
+
+/* 自然数*/
+export function validatNaturalNum(num) {
+  const reg = /^(0|[1-9][0-9]*|-[1-9][0-9]*)$/
+  return reg.test(num)
+}
 
